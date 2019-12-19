@@ -19,7 +19,6 @@ import java.util.Random;
     }
 } 
   
-
  class MyComparator implements Comparator<TreeNode> { 
     public int compare(TreeNode n1, TreeNode n2) 
     { 
@@ -44,6 +43,11 @@ public class huffmanTree {
 		
 	}
 	
+	public huffmanTree()
+	{
+		flippedEncodingMap = new HashMap<>();
+		root=null;
+	}
 	
 	
 	public HashMap<String, Character> getFlippedEncodingMap() {
