@@ -1,7 +1,9 @@
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
@@ -103,7 +105,19 @@ public class Compress {
         }
 	}
       
-	
+public void CompressFolders(File[] fileList)
+{
+	for(int i=0;i<fileList.length;i++)
+	{
+		 String filePath = fileList[i].getAbsolutePath();
+		 int len = (int) fileList[i].length();
+		 compressedBytes.add(len);
+		 //need to add seperator here
+		 createCompressedFile(filePath);
+		
+	}
+}
+
 public void createCompressedFile(String filePath) {
 		
 		FileInputStream in = null;
