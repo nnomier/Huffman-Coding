@@ -107,8 +107,6 @@ public class Compress {
 public void createCompressedFile(String filePath) {
 		
 		FileInputStream in = null;
-       
-
         try {
             in = new FileInputStream(filePath);
             int tempChar, currentIndex = 0, currentB = 0;
@@ -174,13 +172,13 @@ public void createCompressedFile(String filePath) {
 		} 
 	}
 
-	public void writeToFile() {
+	public void writeToFile(String filePath) {
 		
 	
         FileOutputStream out = null;
 
         try {
-        	File outputFile = new File("compressedFile.txt");
+        	File outputFile = new File(filePath);
         	outputFile.createNewFile(); // if file already exists will do nothing 
             out = new FileOutputStream( outputFile, false);
             System.out.println("STARTING FILE PRINT");

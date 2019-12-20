@@ -10,12 +10,11 @@ public class Decompressor {
 
 	TreeNode root =null;
 	static BitReader reader = null;
-	
-	
-	public Decompressor() throws IOException
+	private String filepath;
+	public Decompressor(String filepath) throws IOException
 	{
-		reader = new BitReader("compressedFile.txt");
-	
+		this.filepath=filepath;
+		reader = new BitReader(filepath);
 	}
 	
 	public char createAsciiCharacter() throws IOException
@@ -57,14 +56,15 @@ public class Decompressor {
 
 	public void decompressFile(HashMap<String, Character> codes) {
 		 FileOutputStream out = null;
+		    String decompressedPath= filepath.substring(0,filepath.length()-15)+"_decompressed.txt";
 
 
-for (Map.Entry< String, Character> entry : codes.entrySet())  
+		 for (Map.Entry< String, Character> entry : codes.entrySet())  
             System.out.println("Key = " + entry.getKey() + 
                              ", Value = " + entry.getValue()); 
 	        try {
 	        	
-	        	File outputFile = new File("DecompressedFile.txt");
+	        	File outputFile = new File(decompressedPath);
 	        	outputFile.createNewFile(); // if file already exists will do nothing 
 	            out = new FileOutputStream( outputFile, false);
 	            
