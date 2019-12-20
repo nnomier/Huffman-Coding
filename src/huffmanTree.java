@@ -143,20 +143,7 @@ public class huffmanTree {
 			return root;
 		}
 	 
-	public static void main(String[] args) {
-		int [] arr = new int [256];
-		Random randomGenerator = new Random();
-		HashMap<Character,String> map = new HashMap<>();
-		for(int i=97;i<=127;i++)
-		{
-			int randomInt = randomGenerator.nextInt(50);
-			arr[i] = randomInt;
-		}
-		
-		huffmanTree h = new huffmanTree(arr);
-		map = h.buildTree();
-		System.out.println(Arrays.asList(map)); 
-	}
+	
 
 	
 

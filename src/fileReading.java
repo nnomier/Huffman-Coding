@@ -8,7 +8,43 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 public class fileReading {
 	
 	static String filePath;
-	
+public int[] readBinaryFile() {
+		
+		FileInputStream in = null;
+		
+		int chars[] = new int[265]; 
+	    
+		JFileChooser chooser = new JFileChooser();
+	    FileNameExtensionFilter filter = new FileNameExtensionFilter("JPG & GIF Images", "jpg", "gif");
+	    chooser.setFileFilter(filter);
+	    int returnVal = chooser.showOpenDialog(null);
+	    
+	    if(returnVal == JFileChooser.APPROVE_OPTION) {
+	        System.out.println("You chose to open this file: " +
+	                chooser.getSelectedFile().getAbsolutePath());
+	        
+	        filePath = chooser.getSelectedFile().getAbsolutePath();
+	    }
+	    
+	try {
+		
+		 int c = 0;     
+		 in = new FileInputStream(filePath);
+		    while((c = in.read()) != -1)         //Read byte by byte
+		    {
+		    	char character = (char) c;          //converting integer to char
+		  		chars[character]++;
+		          		          
+		    }
+		
+	}catch( IOException e )
+	{
+		e.printStackTrace();
+	}
+	   
+	 return chars;
+	}
+
 public static int[] readFromFileReturnArray() throws IOException {
 	int chars[] = new int[265]; 
     
@@ -42,7 +78,10 @@ public static int[] readFromFileReturnArray() throws IOException {
 }
 		public static void main(String[] args) throws IOException {
 			
-			int chars[]=readFromFileReturnArray();  
+			
+			fileReading f = new fileReading();
+			//int chars[]=readFromFileReturnArray(); 
+			int chars[] = f.readBinaryFile();
 			huffmanTree huffmanT = new huffmanTree( chars );
 			HashMap<Character, String > codes;
 			TreeNode root;
