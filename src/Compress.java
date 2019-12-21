@@ -12,8 +12,11 @@ public class Compress {
 	ArrayList<Integer> compressedBytes = new ArrayList<Integer>();
 	HashMap<Character, String > codes = new HashMap<Character, String>();
 	TreeNode root;
+	boolean folder=false;
 	boolean lastByte = false;
 	int lastByteIndex = 0;
+	int currentFileBuffer=0;
+	int currentIndex= 0;
 	
 	public Compress(HashMap<Character, String > codes, TreeNode root ) {
 		this.codes = codes;
@@ -29,7 +32,6 @@ public class Compress {
 			str = str + '0';
 			str = preOrderTarversal( root.left, str);
 			str = preOrderTarversal( root.right, str);
-			System.out.println( str );
 			return str;
 		} else
 		{
@@ -46,12 +48,10 @@ public class Compress {
         
         for(int i=0; i<len; i++) //loops on every character in header
         {
-        	System.out.println("CURRENT INDEX IS " + currentIndex );
         	if( header.charAt(i) == '1')
         	{
         		//set the bit with index currentIndex to 1 in currentB
         		currentB = (currentB | (128 >> currentIndex) );
-        		System.out.println("I is "+ i +" char is " + header.charAt(i) + " and we are in 1" + Integer.toBinaryString(currentB));
         		currentIndex++;
         		i++;
 
@@ -62,7 +62,6 @@ public class Compress {
         			tempChar = tempChar >> currentIndex; //example: if current index was 3, that means that buffer has 3 bits already used
             		currentB = currentB | tempChar; //therefore shift character by 3 bits to the left, five bits will be added to buffer
             		compressedBytes.add(currentB);  //or the buffer& shifter character
-            		System.out.println("H" + Integer.toBinaryString(currentB));
             		currentB = 0; //add old buffer to arrayList and empty buffer
             		
             		tempChar = header.charAt(i);  //to get the rest of the bits
@@ -72,7 +71,6 @@ public class Compress {
         		{//the buffer is empty and can take the whole character
         			currentB = currentB | tempChar;
             		compressedBytes.add(currentB);
-            		System.out.println("H" + Integer.toBinaryString(currentB));
             		currentB = 0; //currentIndex is still zero
         		}
         		
@@ -80,14 +78,12 @@ public class Compress {
         	{
         		//do nothing just increment the index
         		currentIndex++;
-        		System.out.println("I is "+ i +" char is " + header.charAt(i) + " and we are in 0" + Integer.toBinaryString(currentB));
         	}
         	
         	
         	if( currentIndex == 8) //if our buffer is full, add it to the array
         	{
         		compressedBytes.add(currentB);
-        		System.out.println("H" + Integer.toBinaryString(currentB));
         		currentB = 0;
         		currentIndex = 0;
         	}
@@ -97,35 +93,31 @@ public class Compress {
         if( currentIndex != 0)
         {
         	compressedBytes.add(currentB);
-        	System.out.println("H" + Integer.toBinaryString(currentB));
         	lastByte = true;
         	lastByteIndex = currentIndex;
         }
 	}
       
 	
-public void createCompressedFile(String filePath) {
-		
+public void createCompressedFile(String filePath,boolean folder, boolean lastFile) {
+		System.out.println("buffer"+currentFileBuffer);
 		FileInputStream in = null;
         try {
             in = new FileInputStream(filePath);
-            int tempChar, currentIndex = 0, currentB = 0;
-            while ((tempChar = in.read()) != -1 ) { //not sure of this condition though, what happens when in.read is called twice when 
-            	//file is already completely read 
+            int tempChar; //shelt currentIndex=0 w 5aleto global
+            while ((tempChar = in.read()) != -1 ) {
+            	
                 
             	if( lastByte ) //check only the first time entering the loop
             	{
-            		
             		currentIndex = this.lastByteIndex;
-            		currentB = compressedBytes.get(compressedBytes.size()-1);
+            		currentFileBuffer = compressedBytes.get(compressedBytes.size()-1);
             		compressedBytes.remove(compressedBytes.size()-1);
             		lastByte = false;
-            		System.out.println(" INSIDE LAST BYTE "+ Integer.toBinaryString(currentB));
             	}
             	
             	String characCode;
                 characCode = codes.get( (char)tempChar);
-                System.out.println("Character code is "+ characCode);
             	
             	
             	int len = characCode.length(); //loop on the character's code
@@ -135,7 +127,7 @@ public void createCompressedFile(String filePath) {
             		if( characCode.charAt(i) == '1')
                 	{
                 		//set the bit with index currentIndex to 1 in currentB
-                		currentB = currentB | (128>> currentIndex);
+                		currentFileBuffer = currentFileBuffer | (128>> currentIndex);
                 		currentIndex++;
                 	}else if( characCode.charAt(i) == '0')
                 	{
@@ -145,56 +137,109 @@ public void createCompressedFile(String filePath) {
             		
             		if( currentIndex == 8 )
             		{
-            			compressedBytes.add(currentB);
-            			System.out.println("NEW ALERT " + Integer.toBinaryString(currentB));
-                		currentB = 0;
+            			compressedBytes.add(currentFileBuffer);
+                		currentFileBuffer = 0;
+                		currentIndex = 0;
+            		}
+            	}     
+           }
+            
+
+            
+        	if( folder && !lastFile )
+            {     System.out.println("its a folder and i finished writing one file");
+            	 int specialChar = 215; 
+            	 String characCode = codes.get((char)specialChar);
+            	 System.out.println("special character is to be written with code is "+characCode);
+                // loop to put the special character
+                int len = characCode.length();
+                for(int i=0; i<len; i++)
+            	{
+            		if( characCode.charAt(i) == '1')
+                	{
+                		//set the bit with index currentIndex to 1 in currentB
+                		currentFileBuffer = currentFileBuffer | (128>> currentIndex);
+                		currentIndex++;
+                	}else if( characCode.charAt(i) == '0')
+                	{
+                		//do nothing just increment the index
+                		currentIndex++;
+                	}
+            		
+            		if( currentIndex == 8 )
+            		{
+            			compressedBytes.add(currentFileBuffer);
+                		currentFileBuffer = 0;
                 		currentIndex = 0;
             		}
             	}
-            	
+            System.out.println("buffer here is"+currentFileBuffer);
+    			
+    		}
+        	
             
-           }
-            
-        	if( currentIndex != 0 )
+        	if(  lastFile || !folder)
         	{
-        		System.out.println("NEW ALERT " + Integer.toBinaryString(currentB));
-        		compressedBytes.add(currentB);
-        		compressedBytes.add(currentIndex); //number of valid bits in last byte
-        	}else
-        	{
-        		compressedBytes.add(8); //number of valid bits is the whole byte
+        		if( currentIndex != 0 )
+        		{
+        			compressedBytes.add(currentFileBuffer);
+        			compressedBytes.add(currentIndex); //number of valid bits in last byte
+        		}else
+        		{
+        			compressedBytes.add(8); //number of valid bits is the whole byte
+        		}
         	}
+            
+            
+            
         	
             in.close();
         } catch (IOException e) {
 			
 			e.printStackTrace();
 		} 
+		
 	}
 
-	public void writeToFile(String filePath) {
+	public long  writeToFile(String filePath) {
 		
-	
+		long len=0;
         FileOutputStream out = null;
 
         try {
         	File outputFile = new File(filePath);
         	outputFile.createNewFile(); // if file already exists will do nothing 
             out = new FileOutputStream( outputFile, false);
-            System.out.println("STARTING FILE PRINT");
             
             for( int character : compressedBytes)
             {
                 out.write(character);
-            	System.out.println( Integer.toBinaryString(character) + " BINARY BYTE "+ (char )character);
             }
-            
+
             if (out != null) {
                 out.close();
             }
+            len=outputFile.length();
         } catch(IOException e) {
         	e.printStackTrace();
-        	System.out.println("HELLO THERE");
         }
+        return len;
 	}
+
+public void createCompressedFolder(File[] listOfFiles) {
+//boolean folderLastByte = false;
+	folder=true;
+	for(int j=0;j<listOfFiles.length;j++)
+	{
+		if( j == (listOfFiles.length - 1) )
+			createCompressedFile(listOfFiles[j].getAbsolutePath(),folder, true);
+		else
+		 createCompressedFile(listOfFiles[j].getAbsolutePath(),folder, false);
+	}
+	
+ 
+}
+
+
+
 }

@@ -37,7 +37,6 @@ public class Decompressor {
 			 	TreeNode t = new TreeNode();
 			 	t.c= createAsciiCharacter();
 			 			//(char) ((char) reader.readByte() & 0xFF);
-			 	System.out.println("TREE CHARACRER " + t.c + " " + Integer.toBinaryString(t.c));
 			 	t.right=null;
 			 	t.left=null;
 			 	return t;
@@ -54,11 +53,11 @@ public class Decompressor {
 		    }
 	}
 
-	public void decompressFile(HashMap<String, Character> codes) {
+	public long decompressFile(HashMap<String, Character> codes) {
 		 FileOutputStream out = null;
 		    String decompressedPath= filepath.substring(0,filepath.length()-15)+"_decompressed.txt";
 
-
+		    long len=0;
 		 for (Map.Entry< String, Character> entry : codes.entrySet())  
             System.out.println("Key = " + entry.getKey() + 
                              ", Value = " + entry.getValue()); 
@@ -87,7 +86,7 @@ public class Decompressor {
 	            		
 	            }
 	            	//out.write(character);
-	           
+	           len=outputFile.length();
 	            
 	            if (out != null) {
 	            	out.flush();
@@ -95,8 +94,71 @@ public class Decompressor {
 	            }
 	        } catch(IOException e) {
 	        	e.printStackTrace();
-	        	System.out.println("HELLO THERE");
 	        }
+			return len;
 	}
 	
+	public long decompressFolder(HashMap<String, Character> codes) {
+		long len=0;
+		int i = 1;
+		int specialChar = 215;
+		 FileOutputStream out = null;
+		 String decompressedPath= filepath.substring(0,filepath.length()-15)+i+"_decompressed.txt";
+		 for (Map.Entry< String, Character> entry : codes.entrySet())  
+	            System.out.println("Key = " + entry.getKey() + 
+	                             ", Value = " + entry.getValue()); 
+
+	        try {
+	        	
+	        	File outputFile = new File(decompressedPath);
+	        	outputFile.createNewFile(); // if file already exists will do nothing 
+	            out = new FileOutputStream( outputFile, false);
+	            
+	            StringBuilder temp = new StringBuilder("");
+	            while(true)
+	            {
+	            	int currentBit =  reader.readBit();
+	            	if( currentBit == -1)
+	            		break;
+	            	else if( currentBit == 0)
+	            		temp.append('0');
+	            	else
+	            		temp.append('1');
+	            	System.out.println(temp);
+	            	if( codes.containsKey(temp.toString()))
+         		{ 		 	
+	            		if (codes.get(temp.toString()).equals((char)specialChar)) {
+	            			len+=outputFile.length(); 
+	            			i++;
+	            			 if (out != null) {
+	         	            	out.flush();
+	         	                out.close();
+	         	            }
+
+	            			decompressedPath= filepath.substring(0,filepath.length()-15)+i+"_decompressed.txt";
+	            			 outputFile = new File(decompressedPath);
+	        	        	outputFile.createNewFile(); // if file already exists will do nothing 
+	        	            out = new FileOutputStream( outputFile, false);
+	        	            temp = new StringBuilder("");
+	            		}
+	            		else {
+	            		System.out.print(codes.get(temp.toString()));
+         			out.write( codes.get(temp.toString()));
+         			temp = new StringBuilder("");
+         			}
+         		}
+	            		
+	            }
+	            	//out.write(character);
+	            len+=outputFile.length();  
+	            
+	            if (out != null) {
+	            	out.flush();
+	                out.close();
+	            }
+	        } catch(IOException e) {
+	        	e.printStackTrace();
+	        }
+	        return len;
+	}
 }
