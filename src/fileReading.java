@@ -7,9 +7,9 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 
 public class fileReading {
-	
 	private  String filePath;
 	private int chars[] = new int[265];
+	private long originalFileLength;
 	
 	public int[] getChars() {
 		return chars;
@@ -25,6 +25,9 @@ public class fileReading {
 		return filePath;
 	}
 
+	public long getOriginalFileLength() {
+		return originalFileLength;
+	}
 	
 	public  File getFile() throws IOException{
 		JFileChooser chooser = new JFileChooser();
@@ -42,15 +45,16 @@ public class fileReading {
 	        this.filePath = chooser.getSelectedFile().getAbsolutePath();
 	    }
 	    
-	    File f=new File(chooser.getSelectedFile().getAbsolutePath());     //Creation of File Descriptor for input file
+	    File f=new File(chooser.getSelectedFile().getAbsolutePath()); 
+	    originalFileLength=f.length();
 	    return f;
 	}
 
 	public File[] folderCompression(File f) throws IOException {
 		File[] listOfFiles = f.listFiles();
-
-		for(int i=0;i<listOfFiles.length;i++)
+			for(int i=0;i<listOfFiles.length;i++)
 		{
+				originalFileLength+=listOfFiles[i].length();
 			 FileReader fr=new FileReader(listOfFiles[i]);   //Creation of File Reader object
 			    BufferedReader br=new BufferedReader(fr);  //Creation of BufferedReader object
 			    int c = 0;     
@@ -62,11 +66,12 @@ public class fileReading {
 			          		          
 			    }
 		}
+		chars[215] = 1;
 		return listOfFiles;
 	}
 	
-	public int[] readFromFileReturnArray(File f) throws IOException {
-	
+	public void readFromFile(File f) throws IOException {
+	    long len = f.length();
 	    FileReader fr=new FileReader(f);   //Creation of File Reader object
 	    BufferedReader br=new BufferedReader(fr);  //Creation of BufferedReader object
 	    int c = 0;     
@@ -79,7 +84,6 @@ public class fileReading {
 	    }
     
     
-	return chars;
 	}
 	
 		public static void main(String[] args) throws IOException {		
