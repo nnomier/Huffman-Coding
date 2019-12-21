@@ -86,6 +86,28 @@ public class fileReading {
     
 	}
 	
+	public void readBinaryFile(File f) {
+		FileInputStream in = null;
+		
+		try {
+			
+			 int c = 0;     
+			 in = new FileInputStream(f);
+			    while((c = in.read()) != -1)         //Read byte by byte
+			    {
+			    	char character = (char) c;          //converting integer to char
+			  		chars[character]++;
+			          		          
+			    }
+			
+		}catch( IOException e )
+		{
+			e.printStackTrace();
+		}
+		   
+		 
+		}
+	
 		public static void main(String[] args) throws IOException {		
 	
 		}

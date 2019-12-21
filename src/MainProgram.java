@@ -21,7 +21,7 @@ public static void main(String[] args) throws IOException {
 	long startTime = System.currentTimeMillis();
 
 	if(choice==1) {
-		fr.readFromFile(f);  
+		fr.readBinaryFile(f);
 	    if(readFileLength==0) {
 	    	System.out.println("File was empty, Compression denied");
 	    	return;
