@@ -16,6 +16,7 @@ public class Compress {
 	boolean lastByte = false;
 	int lastByteIndex = 0;
 	int currentFileBuffer=0;
+	int currentIndex= 0;
 	
 	public Compress(HashMap<Character, String > codes, TreeNode root ) {
 		this.codes = codes;
@@ -103,10 +104,9 @@ public void createCompressedFile(String filePath,boolean folder, boolean lastFil
 		FileInputStream in = null;
         try {
             in = new FileInputStream(filePath);
-            int tempChar, currentIndex = 0;
+            int tempChar; //shelt currentIndex=0 w 5aleto global
             while ((tempChar = in.read()) != -1 ) {
-            	//not sure of this condition though, what happens when in.read is called twice when 
-            	//file is already completely read 
+            	
                 
             	if( lastByte ) //check only the first time entering the loop
             	{
@@ -231,7 +231,7 @@ public void createCompressedFolder(File[] listOfFiles) {
 	folder=true;
 	for(int j=0;j<listOfFiles.length;j++)
 	{
-		if( j == listOfFiles.length - 1)
+		if( j == (listOfFiles.length - 1) )
 			createCompressedFile(listOfFiles[j].getAbsolutePath(),folder, true);
 		else
 		 createCompressedFile(listOfFiles[j].getAbsolutePath(),folder, false);
