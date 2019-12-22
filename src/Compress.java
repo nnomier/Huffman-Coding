@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 
 public class Compress {
 
@@ -117,8 +119,15 @@ public class Compress {
 	}
       
 	
-public void createCompressedFile(String filePath,boolean folder, boolean lastFile) {
-		System.out.println("buffer"+currentFileBuffer);
+public long createCompressedFile(String filePath,boolean folder, boolean lastFile) {
+	
+	 for (Entry<Character, String> entry : codes.entrySet())  
+         System.out.println("Key = " + entry.getKey() + 
+                          ", Value = " + entry.getValue());
+
+		
+	 
+	long fileLength=0;
 		FileInputStream in = null;
         try {
             in = new FileInputStream(filePath);
@@ -166,7 +175,7 @@ public void createCompressedFile(String filePath,boolean folder, boolean lastFil
 
             
         	if( folder && !lastFile )
-            {     System.out.println("its a folder and i finished writing one file");
+            {    
             	 int specialChar = 215; 
             	 String characCode = codes.get((char)specialChar);
                 // loop to put the special character
@@ -211,29 +220,30 @@ public void createCompressedFile(String filePath,boolean folder, boolean lastFil
         	}
             
             
-            
+            fileLength+=outputFile.length();
         	
             in.close();
         } catch (IOException e) {
 			
 			e.printStackTrace();
 		} 
+        return fileLength;
 		
 	}
 
 
-public void createCompressedFolder(File[] listOfFiles) {
-
+public long createCompressedFolder(File[] listOfFiles) {
+	long len=0;
 	folder=true;
 	for(int j=0;j<listOfFiles.length;j++)
 	{
 		if( j == (listOfFiles.length - 1) )
-			createCompressedFile(listOfFiles[j].getAbsolutePath(),folder, true);
+		  len+=createCompressedFile(listOfFiles[j].getAbsolutePath(),folder, true);
 		else
 		 createCompressedFile(listOfFiles[j].getAbsolutePath(),folder, false);
 	}
 	
- 
+ return len;
 }
 
 

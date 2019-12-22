@@ -30,16 +30,12 @@ public static void main(String[] args) throws IOException {
 		huffmanTree huffmanT = new huffmanTree( chars );
 		HashMap<Character, String > codes;
 		TreeNode root;
-	   System.out.println("CHARACTER CODES: ");
 	   codes = huffmanT.buildTree();
-	   System.out.println(codes);
-	   System.out.println("------------------------------------------------------------------------");
 	   root = huffmanT.getRoot();
 	   Compress compress = new Compress(codes, root, compressedFilePath );    
 	   String header = compress.preOrderTarversal(root, "");   
-	   System.out.println("this is header "+ header);
 	   compress.createHeaderBytes(header);	   
-	   compress.createCompressedFile(filePath,false,false);	 
+	   outputFileLength=compress.createCompressedFile(filePath,false,false);	 
 	   
 	   compress.closeWritter();
 	   
@@ -75,7 +71,7 @@ public static void main(String[] args) throws IOException {
 	   Compress compress = new Compress(codes, root, compressedFilePath);    
 	   String header = compress.preOrderTarversal(root, "");   
 	   compress.createHeaderBytes(header);	   
-	   compress.createCompressedFolder(fileList);	 
+	   outputFileLength=compress.createCompressedFolder(fileList);	 
 	   compress.closeWritter();
 	   
 	   ratio = (double)outputFileLength/readFileLength;   

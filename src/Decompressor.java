@@ -80,8 +80,6 @@ public class Decompressor {
 	            	if( codes.containsKey(temp.toString()))
             		{
 	            		//System.out.print(codes.get(temp.toString()));
-	            		if(codes.get(temp.toString()) == '}' )
-	            			System.out.println("U found");
             			out.write( codes.get(temp.toString()));
             			temp = new StringBuilder("");
             		}
@@ -126,7 +124,6 @@ public class Decompressor {
 	            		temp.append('0');
 	            	else
 	            		temp.append('1');
-	            	System.out.println(temp);
 	            	if( codes.containsKey(temp.toString()))
          		{ 		 	
 	            		if (codes.get(temp.toString()).equals((char)specialChar)) {
@@ -144,7 +141,6 @@ public class Decompressor {
 	        	            temp = new StringBuilder("");
 	            		}
 	            		else {
-	            		System.out.print(codes.get(temp.toString()));
          			out.write( codes.get(temp.toString()));
          			temp = new StringBuilder("");
          			}
