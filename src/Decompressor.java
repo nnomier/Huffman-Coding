@@ -79,13 +79,15 @@ public class Decompressor {
 	            		temp.append('1');
 	            	if( codes.containsKey(temp.toString()))
             		{
-	            		System.out.print(codes.get(temp.toString()));
+	            		//System.out.print(codes.get(temp.toString()));
+	            		if(codes.get(temp.toString()) == '}' )
+	            			System.out.println("U found");
             			out.write( codes.get(temp.toString()));
             			temp = new StringBuilder("");
             		}
 	            		
 	            }
-	            	//out.write(character);
+	            	
 	           len=outputFile.length();
 	            
 	            if (out != null) {

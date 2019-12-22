@@ -9,18 +9,33 @@ import java.util.HashMap;
 
 public class Compress {
 
-	ArrayList<Integer> compressedBytes = new ArrayList<Integer>();
 	HashMap<Character, String > codes = new HashMap<Character, String>();
+	FileOutputStream out;
+	File outputFile;
 	TreeNode root;
 	boolean folder=false;
 	boolean lastByte = false;
-	int lastByteIndex = 0;
+	int lastIndex=0;
 	int currentFileBuffer=0;
 	int currentIndex= 0;
+	int lastHeaderByte;
 	
-	public Compress(HashMap<Character, String > codes, TreeNode root ) {
+	
+	public void closeWritter() {
+		try {
+			out.flush();
+			out.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+	}
+	public Compress(HashMap<Character, String > codes, TreeNode root, String compressedFilePath ) throws IOException {
 		this.codes = codes;
 		this.root = root;
+	    outputFile = new File(compressedFilePath);
+    	outputFile.createNewFile(); // if file already exists will do nothing 
+	    out = new FileOutputStream( outputFile , false);
 	}
 	
 	public String preOrderTarversal(  TreeNode root, String str )
@@ -41,7 +56,7 @@ public class Compress {
 		}
 	}
 	
-	public void createHeaderBytes( String header )
+	public void createHeaderBytes( String header ) throws IOException
 	{
 		int currentB = 0;
         int len = header.length(), currentIndex = 0;
@@ -61,7 +76,7 @@ public class Compress {
         		{
         			tempChar = tempChar >> currentIndex; //example: if current index was 3, that means that buffer has 3 bits already used
             		currentB = currentB | tempChar; //therefore shift character by 3 bits to the left, five bits will be added to buffer
-            		compressedBytes.add(currentB);  //or the buffer& shifter character
+            		out.write(currentB);
             		currentB = 0; //add old buffer to arrayList and empty buffer
             		
             		tempChar = header.charAt(i);  //to get the rest of the bits
@@ -70,7 +85,8 @@ public class Compress {
         		}else
         		{//the buffer is empty and can take the whole character
         			currentB = currentB | tempChar;
-            		compressedBytes.add(currentB);
+            		//compressedBytes.add(currentB);
+        			out.write(currentB);
             		currentB = 0; //currentIndex is still zero
         		}
         		
@@ -83,7 +99,8 @@ public class Compress {
         	
         	if( currentIndex == 8) //if our buffer is full, add it to the array
         	{
-        		compressedBytes.add(currentB);
+        		//compressedBytes.add(currentB);
+        		out.write(currentB);
         		currentB = 0;
         		currentIndex = 0;
         	}
@@ -92,9 +109,10 @@ public class Compress {
         
         if( currentIndex != 0)
         {
-        	compressedBytes.add(currentB);
+        	//compressedBytes.add(currentB);
+        	lastHeaderByte = currentB;
         	lastByte = true;
-        	lastByteIndex = currentIndex;
+        	lastIndex = currentIndex;
         }
 	}
       
@@ -110,9 +128,9 @@ public void createCompressedFile(String filePath,boolean folder, boolean lastFil
                 
             	if( lastByte ) //check only the first time entering the loop
             	{
-            		currentIndex = this.lastByteIndex;
-            		currentFileBuffer = compressedBytes.get(compressedBytes.size()-1);
-            		compressedBytes.remove(compressedBytes.size()-1);
+            		
+            		currentFileBuffer = lastHeaderByte;
+            		currentIndex = lastIndex;
             		lastByte = false;
             	}
             	
@@ -137,7 +155,8 @@ public void createCompressedFile(String filePath,boolean folder, boolean lastFil
             		
             		if( currentIndex == 8 )
             		{
-            			compressedBytes.add(currentFileBuffer);
+            			//compressedBytes.add(currentFileBuffer);
+            			out.write(currentFileBuffer);
                 		currentFileBuffer = 0;
                 		currentIndex = 0;
             		}
@@ -150,7 +169,6 @@ public void createCompressedFile(String filePath,boolean folder, boolean lastFil
             {     System.out.println("its a folder and i finished writing one file");
             	 int specialChar = 215; 
             	 String characCode = codes.get((char)specialChar);
-            	 System.out.println("special character is to be written with code is "+characCode);
                 // loop to put the special character
                 int len = characCode.length();
                 for(int i=0; i<len; i++)
@@ -168,12 +186,13 @@ public void createCompressedFile(String filePath,boolean folder, boolean lastFil
             		
             		if( currentIndex == 8 )
             		{
-            			compressedBytes.add(currentFileBuffer);
+            			
+            			out.write(currentFileBuffer);
                 		currentFileBuffer = 0;
                 		currentIndex = 0;
             		}
             	}
-            System.out.println("buffer here is"+currentFileBuffer);
+            
     			
     		}
         	
@@ -182,11 +201,12 @@ public void createCompressedFile(String filePath,boolean folder, boolean lastFil
         	{
         		if( currentIndex != 0 )
         		{
-        			compressedBytes.add(currentFileBuffer);
-        			compressedBytes.add(currentIndex); //number of valid bits in last byte
+        			out.write(currentFileBuffer);
+        			out.write(currentIndex);
         		}else
         		{
-        			compressedBytes.add(8); //number of valid bits is the whole byte
+        			out.write(8);
+        			
         		}
         	}
             
@@ -201,33 +221,9 @@ public void createCompressedFile(String filePath,boolean folder, boolean lastFil
 		
 	}
 
-	public long  writeToFile(String filePath) {
-		
-		long len=0;
-        FileOutputStream out = null;
-
-        try {
-        	File outputFile = new File(filePath);
-        	outputFile.createNewFile(); // if file already exists will do nothing 
-            out = new FileOutputStream( outputFile, false);
-            
-            for( int character : compressedBytes)
-            {
-                out.write(character);
-            }
-
-            if (out != null) {
-                out.close();
-            }
-            len=outputFile.length();
-        } catch(IOException e) {
-        	e.printStackTrace();
-        }
-        return len;
-	}
 
 public void createCompressedFolder(File[] listOfFiles) {
-//boolean folderLastByte = false;
+
 	folder=true;
 	for(int j=0;j<listOfFiles.length;j++)
 	{

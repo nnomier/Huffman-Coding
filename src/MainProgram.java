@@ -35,12 +35,14 @@ public static void main(String[] args) throws IOException {
 	   System.out.println(codes);
 	   System.out.println("------------------------------------------------------------------------");
 	   root = huffmanT.getRoot();
-	   Compress compress = new Compress(codes, root);    
+	   Compress compress = new Compress(codes, root, compressedFilePath );    
 	   String header = compress.preOrderTarversal(root, "");   
+	   System.out.println("this is header "+ header);
 	   compress.createHeaderBytes(header);	   
 	   compress.createCompressedFile(filePath,false,false);	 
-	   outputFileLength=compress.writeToFile(compressedFilePath);
-	   //compression file divided by original text file read
+	   
+	   compress.closeWritter();
+	   
 	   ratio = (double)outputFileLength/readFileLength;   
 	}
 	else if(choice==2)
@@ -50,7 +52,7 @@ public static void main(String[] args) throws IOException {
 		decompressor.root =  decompressor.reconstructHuffmanTree();
 		huffmanT.FlipEncodingMap(decompressor.root, "");
 		outputFileLength=decompressor.decompressFile(huffmanT.getFlippedEncodingMap());
-		//compression file divided by decompressed file 
+	
 		ratio = (double)readFileLength/outputFileLength;
 	}
 	else if(choice==3)
@@ -70,12 +72,12 @@ public static void main(String[] args) throws IOException {
 		codes = huffmanT.buildTree();
 		System.out.println(codes);
 	    root = huffmanT.getRoot();
-	   Compress compress = new Compress(codes, root);    
+	   Compress compress = new Compress(codes, root, compressedFilePath);    
 	   String header = compress.preOrderTarversal(root, "");   
 	   compress.createHeaderBytes(header);	   
 	   compress.createCompressedFolder(fileList);	 
+	   compress.closeWritter();
 	   
-	   outputFileLength=compress.writeToFile(filePath+"_compressed.txt");
 	   ratio = (double)outputFileLength/readFileLength;   
 
 
@@ -86,7 +88,7 @@ public static void main(String[] args) throws IOException {
 		Decompressor decompressor = new Decompressor(filePath);
 		decompressor.root =  decompressor.reconstructHuffmanTree();
 		huffmanT.FlipEncodingMap(decompressor.root, "");
-		//outputfilelength here is the total length of the folder
+	
 		outputFileLength=decompressor.decompressFolder(huffmanT.getFlippedEncodingMap());
 		ratio = (double)readFileLength/outputFileLength;
 
