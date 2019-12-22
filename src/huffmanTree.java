@@ -83,7 +83,7 @@ public class huffmanTree {
 	
 	public HashMap<Character,String> buildTree() {
 		addLeafNodes();
-		
+		 
 		if(heap.size()==1)
 		{   TreeNode dummy = new TreeNode();
 			dummy.c='-';
@@ -123,7 +123,6 @@ public class huffmanTree {
 	    { 
 	        if (root.left== null && root.right == null) { 
 	        	encodingMap.put(root.c, s);
-	        	System.out.println("This character was in the tree" + root.c + "with code "+ s);
 	            return; 
 	        } 
 	        if(root.left!=null)
